@@ -1,34 +1,99 @@
 <!DOCTYPE html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>Overlay remover tests</title>
-  <link rel="stylesheet" href="./node_modules/qunitjs/qunit/qunit.css"/>
+    <meta charset="UTF-8">
+    <title>Overlay remover test</title>
 </head>
+
 <body>
-<div id="qunit"></div>
-  <div id="qunit-fixture">
-    <div id="toTestWeight0"></div>
-    <div id="toTestWeight1">
-        Lala
-    </div>
-    <div id="toTestWeight3">
-        Lala<br/>
-        Lala
-    </div>
-    <div id="toTestWeight4"><div>Lala</div><div>Lala</div></div>
-    <div id="toTestWeight8"><div>Lala<div>Lala<div>Lala<div>Lala</div></div></div></div></div>
-    <div id="toTestWeight14"><div>Lala<div>Lala<div>Lala<div>Lala<div>Lala<div>Lala<div>Lala</div></div></div></div></div></div></div></div>
-    <div id="toTestWeight">
-        Lala
-        <div>Lolo
-            <div>Da</div>
-            <div></div>
-            <div></div>
+    <style>    
+        .JSWQd {
+            width:100%;
+            position:absolute;
+            top:0;left:0;
+            height:100%;
+            opacity: .55; /* Standard: FF gt 1.5, Opera, Safari, CSS3 */
+            filter: alpha(opacity=55); /* IE lt 8 */
+            -ms-filter: "alpha(opacity=55)"; /* IE 8 */
+            -khtml-opacity: .55; /* Safari 1.x */
+            -moz-opacity: .55; /* FF lt 1.5, Netscape */
+            background-color:black;
+            position:fixed;
+            display:table-cell;
+            z-index:11;
+        }
+        .gEkYr {
+            z-index:12;
+            position: absolute;
+            display: block;
+            top:50%;
+            margin-top:-208px;
+            margin-left:-480px;
+            left:50%;
+            width:100%;
+            height:100%;
+            position:fixed;
+        }
+        .NTJBo {
+            width:920px;
+            background-color:white;
+            padding:20px;
+            text-align:left;
+            font-size:14px;
+            vertical-align:middle;
+            border-radius: 5px;
+            border: 0px solid #fff;
+            display:block;
+        }
+    </style>
+    <div id="qunit"></div>
+    <div id="qunit-fixture">
+        <div id="toTestWeight0"></div>
+        <div id="toTestWeight1">
+            Lala
+        </div>
+        <div id="toTestWeight3">
+            Lala<br />
+            Lala
+        </div>
+        <div id="toTestWeight4">
+            <div>Lala</div>
+            <div>Lala</div>
+        </div>
+        <div id="toTestWeight8">
+            <div>Lala<div>Lala<div>Lala<div>Lala</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="toTestWeight14">
+            <div>Lala<div>Lala<div>Lala<div>Lala<div>Lala<div>Lala<div>Lala</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="toTestWeight">
+            Lala
+            <div>Lolo
+                <div>Da</div>
+                <div></div>
+                <div></div>
+            </div>
         </div>
     </div>
-  </div>
-  <script src="./node_modules/qunitjs/qunit/qunit.js"></script>
-  <script src="../chrome/js/overlay_remover.js"></script>
-  <script src="tests.js"></script>
+
+    <div id="nSqEB">
+        <div class="gEkYr">
+            <div class="NTJBo">
+                <span style="color:#1C6593">header</span>
+                <div style="display:inline-block;float:right;color:#ccc" id="ccd"></div>
+                <br><br>This is an overlay message
+            </div>
+        </div>
+        <div class="JSWQd"></div>
+    </div>
 </body>
 </html>

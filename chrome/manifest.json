@@ -1,33 +1,31 @@
 {
-  "name": "Behind The Overlay",
-  "author": "Nicolae Namolovan",
-  "description": "One click to close any overlay on any website.",
-  "version": "0.1.6",
+  "name": "Overlay Remover Auto",
+  "author": "InanZen",
+  "description": "Automaticaly close detected overlays.",
+  "version": "1.0",
+  "manifest_version": 2,
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "tabs"
   ],
   "background": {
-    "scripts": ["js/background.js", "js/overlay_remover.js"],
+    "scripts": ["js/ora_bg_script.js"],
     "persistent": false
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "run_at": "document_end",
+      "js": ["js/overlay_remover.js"]
+    }
+  ],
   "browser_action": {
     "default_icon": {
-       "32": "images/courtain_32.png",
-       "38": "images/courtain_38.png",
-       "64": "images/courtain_64.png"
+       "32": "images/jalousie_open.svg"
     },
-    "default_title": "❌ Overlay from this page"
-  },
-  "commands": {
-    "_execute_browser_action": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+X"
-      },
-      "description": "❌ Overlay from this page"
-    }
+    "default_title": "Enabled"
   },
   "icons": {
-    "128": "images/courtain_128.png"
-  },
-  "manifest_version": 2
+    "128": "images/jalousie_open.svg"
+  }
 }
