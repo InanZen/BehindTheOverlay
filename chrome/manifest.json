@@ -13,7 +13,7 @@
     "page": "ora_options.html"
   },
   "background": {
-    "scripts": ["js/ora_bg_script.js"],
+    "scripts": ["js/ora_background.js"],
     "persistent": false
   },
   "content_scripts": [
