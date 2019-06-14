@@ -180,7 +180,6 @@ var overlayRemover = function (debug, utils) {
 };
 
 overlayRemoverInstance = overlayRemover(debug, utils);
-var hiddenElements = new Array();
 
 function overlayRemoverRun() {    
     var count = overlayRemoverInstance.run();
@@ -193,12 +192,10 @@ function toggleOverlays(hide)
     if (hide)
     {
         overlayRemoverRun();
-        localStorage.removeItem("isenabled");
     }
     else
     {
         clearInterval(intervalHandle); 
-        localStorage.setItem("isenabled", false);
 
         for (var i = 0; i < hiddenElements.length; i++)
         {
@@ -211,49 +208,73 @@ function toggleOverlays(hide)
 }
 
 
-var runCount = 0;
+var hiddenElements = new Array();
 var intervalHandle;
-function Update()
+var isEnabled = false;
+var loadRun = true;
+var timerRun = true;
+var timerInterval = 300;
+var timerCount = 20;
+var timerStopOnFound = true;
+var runCount = 0;
+
+function updateTimedRun()
 {
-    var count = overlayRemoverRun();
-    if (count > 0)
+    if (timerStopOnFound && hiddenElements.length > 0)
     {
         clearInterval(intervalHandle);
         return;
-    }
+    }    
+
+    overlayRemoverRun();
 
     runCount++;
-    if (runCount > 20)    
+    if (runCount >= timerCount)    
         clearInterval(intervalHandle);     
 }
 
-window.onload = function () {    
-    var isenabled = localStorage.getItem("isenabled");
-    if (isenabled == null)
-        isenabled = true;
 
-    if (isenabled == true)
-    {        
-        var count = overlayRemoverRun();
-        if (count == 0)
-            intervalHandle = setInterval(Update, 500);
-    }
-    else    
-        chrome.runtime.sendMessage({ isenabled: false });    
-
-    /*
+function readyToRun() 
+{   
     chrome.runtime.sendMessage({ readyToRun: true }, function(response)
     {
-        if (response.run)
-            overlayRemoverRun();
-    }); 
-    */
+        if (response != undefined)
+        {            
+            isEnabled = response.isEnabled;
+            loadRun = response.loadRun;
+            timerRun = response.timerRun;
+            timerCount = response.timerCount;
+            timerInterval = response.timerInterval;
+            timerStopOnFound = response.timerStopOnFound;
+
+            if (isEnabled)
+            {
+                if (loadRun)
+                    overlayRemoverRun();
+                if (timerRun)
+                {
+                    intervalHandle = setInterval(updateTimedRun, timerInterval);
+                }
+            }
+        }
+    });      
 }
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) 
     {
         if (request.hideOverlays != undefined)        
-            toggleOverlays(request.hideOverlays);        
+            toggleOverlays(request.hideOverlays);   
+        else if (request.setSettings != undefined)
+        {            
+            isEnabled = response.isEnabled;
+            loadRun = response.loadRun;
+            timerRun = response.timerRun;
+            timerCount = response.timerCount;
+            timerInterval = response.timerInterval;
+            timerStopOnFound = response.timerStopOnFound;
+        }
     }
 );
+
+window.addEventListener("load", readyToRun);

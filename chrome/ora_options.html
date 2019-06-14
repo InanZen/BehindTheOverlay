@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+
+  <body>
+
+    <form>        
+        <fieldset>
+            <legend>Default settings:</legend>
+            <span style="font-size:1.3em"><input type="checkbox" id="defaultEnabled"> Enabled by default for all websites</span><br/><br/>
+            <p>These settings define defaults for websites that have OverlayRemoverAuto enabled for them:</p>
+            <input type="checkbox" id="defaultLoadRun" > Run on page load<br/>
+            <input type="checkbox" id="defaultTimerRun" > Run on timer after page loads <br/>
+            <label>  Number of timed runs: <input type="number" id="defaultTimerCount" /></label><br/>
+            <label>  Interval between runs (miliseconds): <input type="number" id="defaultTimerInterval" /></label><br/>
+            <label>  Stop timer if overlay found: <input type="checkbox" id="defaultTimerStopOnFound" /></label>
+        </fieldset>
+        <button type="submit">Save settings</button>
+    </form>
+
+    <script src="js/ora_options.js" ></script>
+  </body>
+
+</html>

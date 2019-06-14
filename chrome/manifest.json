@@ -2,12 +2,16 @@
   "name": "Overlay Remover Auto",
   "author": "InanZen",
   "description": "Automaticaly close detected overlays.",
-  "version": "1.0",
+  "version": "1.1",
   "manifest_version": 2,
   "permissions": [
     "activeTab",
-    "tabs"
-  ],
+    "tabs",
+    "storage"
+  ],  
+  "options_ui": {
+    "page": "ora_options.html"
+  },
   "background": {
     "scripts": ["js/ora_bg_script.js"],
     "persistent": false
@@ -21,9 +25,10 @@
   ],
   "browser_action": {
     "default_icon": {
-       "32": "images/jalousie_open.svg"
+       "32": "images/jalousie_closed.svg"
     },
-    "default_title": "Enabled"
+    "default_title": "OverlayRemoverAuto",    
+    "default_popup": "ora_popup.html"
   },
   "icons": {
     "128": "images/jalousie_open.svg"

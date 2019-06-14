@@ -1,12 +1,16 @@
-// Copyright (c) 2011 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 var chrome = chrome || browser;
+
+var defaultEnabled = false;
+var default_loadRun = true;
+var default_timerRun = true;
+var default_timerInterval = 300;
+var default_timerCount = 20;
+var default_timerStopOnFound = true;
+
 var tabSettings = new Array();
 var hostSettings = new Array();
 
-function DisplayCounterForTabID(tabID)
+function displayCounterForTabID(tabID)
 {    
     var tabCount = 0;
     if (tabSettings[tabID])
@@ -17,24 +21,23 @@ function DisplayCounterForTabID(tabID)
     else    
         chrome.browserAction.setBadgeText({text: tabCount.toString()});    
 }
-function SetIconForTabID(tabID)
+function setIconForTabID(tabID)
 {
-    var isenabled = true;
+    var isenabled = defaultEnabled;
     if (tabSettings[tabID])
         isenabled = tabSettings[tabID].enabled;
 
-    SetIcon(isenabled);
+    setIcon(isenabled);
 }
-function SetIcon(flag)
+function setIcon(isenabled)
 {
-    if (flag)
+    if (isenabled)
     {
         chrome.browserAction.setIcon({
             path: {
                 "32": "images/jalousie_open.svg"
             }   
         });
-        chrome.browserAction.setTitle({title: "Enabled"});
     }
     else
     {
@@ -43,101 +46,175 @@ function SetIcon(flag)
                 "32": "images/jalousie_closed.svg"
             }   
         });
-        chrome.browserAction.setTitle({title: "Disabled"});
     }
 }
-function ToggleOverlay(tab)
+function toggleOverlay(tabID)
+{      
+    var isenabled = defaultEnabled;
+    if (tabSettings[tabID])
+        isenabled = tabSettings[tabID].enabled;
+    else
+        tabSettings[tabID] = { enabled: isenabled, count: 0 };
+
+    isenabled = !isenabled;
+    tabSettings[tabID].enabled = isenabled;
+
+    setIcon(isenabled);
+
+    chrome.tabs.sendMessage(tabID, { hideOverlays: isenabled }); 
+}
+
+function loadSettings() 
 {
-    if (tab)
-    {        
-        var tabID = tab.id;        
-        var isenabled = true;
-        if (tabSettings[tabID])
-            isenabled = tabSettings[tabID].enabled;
-        else
-            tabSettings[tabID] = { enabled: true, count: 0 };
-
-        isenabled = !isenabled;
-        tabSettings[tabID].enabled = isenabled;
-
-        var hostname = tab.url.split("/")[2];  
-        hostSettings[hostname] = isenabled;
-
-        SetIcon(isenabled);
-
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, { hideOverlays: isenabled });
-        });
-    }
+    chrome.storage.local.get({
+        "defaultEnabled": false, 
+        "defaultLoadRun": true,
+        "defaultTimerRun": true,
+        "defaultTimerCount": 20,
+        "defaultTimerInterval": 300,
+        "defaultTimerStopOnFound": true,
+        "hostSettings": new Array()
+    }, function(result)
+    {
+        defaultEnabled = result.defaultEnabled;
+        default_loadRun = result.defaultLoadRun;
+        default_timerRun = result.defaultTimerRun;
+        default_timerCount = result.defaultTimerCount;
+        default_timerInterval = result.defaultTimerInterval;
+        default_timerStopOnFound = result.defaultTimerStopOnFound;
+        
+        if (result.hostSettings != undefined)
+            hostSettings = result.hostSettings; 
+    });
 }
+
+function getDefaultSettings()
+{
+    return {
+        isEnabled: defaultEnabled, 
+        loadRun: default_loadRun, 
+        timerRun: default_timerRun, 
+        timerCount: default_timerCount, 
+        timerInterval: default_timerInterval,
+        timerStopOnFound: default_timerStopOnFound
+    };
+}
+
 
 chrome.browserAction.setBadgeBackgroundColor({color: "#666666"});
 try { chrome.browserAction.setBadgeTextColor({color: "white"}); }
-catch(err)   {  }
-chrome.browserAction.onClicked.addListener((tab) => { ToggleOverlay(tab); });
+catch(err) {  }
+
 chrome.tabs.onActivated.addListener(
     (activeInfo) => {
-        DisplayCounterForTabID(activeInfo.tabId);
-        SetIconForTabID(activeInfo.tabId);
+        var tabID = activeInfo.tabId;
+        if (tabSettings[tabID] == undefined)                
+            tabSettings[tabID] = { enabled: defaultEnabled, count: 0 };        
+        displayCounterForTabID(tabID);
+        setIconForTabID(tabID);
     }
 );
+
 chrome.tabs.onUpdated.addListener(
-    function (tabId, changeInfo, tab)
+    function (tabID, changeInfo, tab)
     {
         if (changeInfo.url) 
         {
-            var isenabled = true;
+            var isenabled = defaultEnabled;
             var hostname = changeInfo.url.split("/")[2];
-            if (hostSettings[hostname] != undefined)
-            {
-                isenabled = hostSettings[hostname];
-            }
-            
-            if (tabSettings[tabId])
-            {
-                tabSettings[tabId].enabled = isenabled;
-                tabSettings[tabId].count = 0;
-            } 
-            else
-            {
-                tabSettings[tabId] = { enabled: isenabled, count: 0 };
-            }
-            SetIconForTabID(tabId);
+            if (hostSettings[hostname] != undefined)            
+                isenabled = hostSettings[hostname].isEnabled;   
+
+            tabSettings[tabID] = { enabled: isenabled, count: 0 };        
+            displayCounterForTabID(tabID);
+            setIconForTabID(tabID);
         }
     }
 );
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) 
     {
+       /* console.log("message received");
+        console.log(request);
+        console.log(sender);*/
+
         if (request.removeCount != undefined)
         {
             var tabID = sender.tab.id;
             if (tabSettings[tabID])
                 tabSettings[tabID].count = request.removeCount;
             else
-                tabSettings[tabID] = { enabled: true, count: request.removeCount };
-            DisplayCounterForTabID(tabID);
+                tabSettings[tabID] = { enabled: defaultEnabled, count: request.removeCount };
+            displayCounterForTabID(tabID);
         }
-        if (request.isenabled != undefined)
+        if (request.readyToRun)
         {
-            var tabID = sender.tab.id;
-            if (tabSettings[tabID])
-                tabSettings[tabID].enabled = request.isenabled;
+            var hostname = sender.tab.url.split("/")[2];
+            if (hostSettings[hostname] != undefined)
+                sendResponse(hostSettings[hostname]);              
             else
-                tabSettings[tabID] = { enabled: request.isenabled, count: 0 };
-
-            var hostname = sender.tab.url.split("/")[2];            
-            hostSettings[hostname] = request.isenabled;
-
-            SetIconForTabID(tabID);
+            {
+                var defaultSettings = getDefaultSettings();
+                sendResponse(defaultSettings);
+            } 
         }
-        /*if (request.readyToRun)
+        if (request.getPopupSettings != undefined)
+        {                
+            var hostname = request.getPopupSettings;    
+            if (hostSettings[hostname] != undefined)
+                sendResponse(hostSettings[hostname]);              
+            else
+            {
+                var defaultSettings = getDefaultSettings();
+                sendResponse(defaultSettings);
+            }
+        }
+        if (request.getDefaultSettings != undefined)
+        {                
+            var defaultSettings = getDefaultSettings();
+            sendResponse(defaultSettings);            
+        }
+        if (request.setHostSettings != undefined)
+        {                
+            var hostname = request.setHostSettings;  
+            var tabID = request.tabID;
+
+            hostSettings[hostname] = {
+                isEnabled: request.isEnabled,
+                loadRun: request.loadRun, 
+                timerRun: request.timerRun, 
+                timerCount: request.timerCount, 
+                timerInterval: request.timerInterval,
+                timerStopOnFound: request.timerStopOnFound
+            };
+            
+            chrome.tabs.sendMessage(tabID, { setSettings: hostSettings[hostname] });
+
+            if (tabSettings[tabID] == undefined)                
+                tabSettings[tabID] = { enabled: defaultEnabled, count: 0 };
+
+            if (hostSettings[hostname].isEnabled != tabSettings[tabID].enabled)            
+                toggleOverlay(tabID);
+
+            if (hostSettings[hostname].isEnabled == defaultEnabled &&
+                hostSettings[hostname].loadRun == default_loadRun &&
+                hostSettings[hostname].timerRun == default_timerRun &&
+                hostSettings[hostname].timerCount == default_timerCount &&
+                hostSettings[hostname].timerInterval == default_timerInterval &&
+                hostSettings[hostname].timerStopOnFound == default_timerStopOnFound)
+            {
+                delete hostSettings[hostname];             
+            }
+            chrome.storage.local.set({
+                hostSettings: hostSettings
+            });
+        }
+
+        if (request.defaultsChanged == true)
         {
-            var hostname = sender.tab.url.split("/")[2];            
-            var isenabled = hostSettings[hostname];
-            if (hostSettings[hostname] == undefined)
-                isenabled = true;
-            sendResponse({run: isenabled});
-        }*/
+            loadSettings();
+        }        
     }
 );
+
+loadSettings();
