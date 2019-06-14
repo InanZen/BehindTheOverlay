@@ -44,7 +44,7 @@ function loadSettings(tabs)
 
 function setForm()
 {
-    document.querySelector("#hostname").innerHTML = hostname;
+    document.querySelector("#hostname").value = hostname;
     if (isEnabled)
     {
         document.querySelector("#isEnabled").value = "Enabled";
