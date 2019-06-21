@@ -9,6 +9,8 @@ Can be easily configured for specific website (by clicking the the extension but
 [Chrome Extension](https://chrome.google.com/webstore/detail/overlay-remover-auto/bleeelcpenoboaoodilaaapgbgjdjdaj)
 
 ## News
+21 june 2019 | Version 1.1.1
+ * Fixed Chrome unsupported SVG icons, changed to 128px PNG. 
 
 14 june 2019 | Version 1.1
  * Per website settings now available trough popup (clicking icon now shows settings)

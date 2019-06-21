@@ -35,7 +35,7 @@ function setIcon(isenabled)
     {
         chrome.browserAction.setIcon({
             path: {
-                "32": "images/jalousie_open.svg"
+                "128": "images/jalousie_open_128.png"
             }   
         });
     }
@@ -43,7 +43,7 @@ function setIcon(isenabled)
     {
         chrome.browserAction.setIcon({
             path: {
-                "32": "images/jalousie_closed.svg"
+                "128": "images/jalousie_closed_128.png"
             }   
         });
     }

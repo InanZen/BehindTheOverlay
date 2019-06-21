@@ -2,7 +2,7 @@
   "name": "Overlay Remover Auto",
   "author": "InanZen",
   "description": "Automaticaly close detected overlays.",
-  "version": "1.1",
+  "version": "1.1.1",
   "manifest_version": 2,
   "permissions": [
     "activeTab",
@@ -28,6 +28,6 @@
     "default_popup": "ora_popup.html"
   },
   "icons": {
-    "128": "images/jalousie_open.png"
+    "128": "images/jalousie_open_128.png"
   }
 }
