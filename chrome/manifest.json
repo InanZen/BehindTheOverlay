@@ -24,13 +24,10 @@
     }
   ],
   "browser_action": {
-    "default_icon": {
-       "32": "images/jalousie_closed.svg"
-    },
     "default_title": "OverlayRemoverAuto",    
     "default_popup": "ora_popup.html"
   },
   "icons": {
-    "128": "images/jalousie_open.svg"
+    "128": "images/jalousie_open.png"
   }
 }
